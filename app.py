@@ -4,6 +4,7 @@ import requests
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
+from a2wsgi import ASGIMiddleware
 
 load_dotenv()
 
@@ -107,12 +108,12 @@ def parse_llm_json(raw_text):
     return json.loads(raw_text)
 
 # Create FastAPI application
-app = FastAPI(title="Master English - AI Tutor")
+fastapi_app = FastAPI(title="Master English - AI Tutor")
 
 # Serve index.html directly on root '/' and '/static/index.html'
-@app.get("/", response_class=HTMLResponse)
-@app.get("/index.html", response_class=HTMLResponse)
-@app.get("/static/index.html", response_class=HTMLResponse)
+@fastapi_app.get("/", response_class=HTMLResponse)
+@fastapi_app.get("/index.html", response_class=HTMLResponse)
+@fastapi_app.get("/static/index.html", response_class=HTMLResponse)
 async def serve_index():
     try:
         possible_paths = [
@@ -130,7 +131,7 @@ async def serve_index():
     except Exception as e:
         return HTMLResponse(content=f"<h1>Server Error: {str(e)}</h1>", status_code=200)
 
-@app.post("/generate_scenario")
+@fastapi_app.post("/generate_scenario")
 async def generate_scenario(request: Request):
     try:
         data = await request.json()
@@ -153,7 +154,7 @@ async def generate_scenario(request: Request):
             "error": f"Failed to generate conversation: {str(e)}"
         }, status_code=500)
 
-@app.post("/generate_example")
+@fastapi_app.post("/generate_example")
 async def generate_example(request: Request):
     try:
         data = await request.json()
@@ -178,12 +179,24 @@ async def generate_example(request: Request):
             "error": f"Failed to generate example sentence: {str(e)}"
         }, status_code=500)
 
+# Dual WSGI / ASGI compatibility wrapper
+asgi_app = fastapi_app
+wsgi_app = ASGIMiddleware(fastapi_app)
+
+class DualApp:
+    def __call__(self, *args, **kwargs):
+        if len(args) == 2:
+            return wsgi_app(*args, **kwargs)
+        return asgi_app(*args, **kwargs)
+
+app = DualApp()
+
 if __name__ == "__main__":
     import uvicorn
-    port_str = os.getenv("PORT", "7860")
+    port_str = os.getenv("PORT", "8080").strip()
     try:
         port = int(port_str)
     except ValueError:
-        port = 7860
+        port = 8080
     print(f"Starting server on 0.0.0.0:{port}...")
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    uvicorn.run(fastapi_app, host="0.0.0.0", port=port)
