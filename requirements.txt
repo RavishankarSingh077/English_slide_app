@@ -2,3 +2,4 @@ python-dotenv
 requests
 fastapi
 uvicorn
+gunicorn
