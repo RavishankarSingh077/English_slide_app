@@ -1,0 +1,1775 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scenario Slide Player - Master English</title>
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(22, 28, 45, 0.45);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-border-hover: rgba(255, 255, 255, 0.18);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+
+            /* Gradients */
+            --primary-gradient: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+            --secondary-gradient: linear-gradient(135deg, #b155ff 0%, #6b11ff 100%);
+            --orange-gradient: linear-gradient(135deg, #ff9233 0%, #ff5e3a 100%);
+
+            --accent-cyan: #00f2fe;
+            --accent-purple: #b155ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(107, 17, 255, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(0, 242, 254, 0.12) 0px, transparent 50%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* App Layout Container */
+        #app-container {
+            width: 100%;
+            max-width: 950px;
+            min-height: 90vh;
+            margin: 20px;
+            background: rgba(13, 18, 33, 0.7);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Title / Header */
+        header {
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .logo {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 1.4rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* SCREEN 1: Dashboard View */
+        #dashboard-view {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 35px;
+            flex-grow: 1;
+        }
+
+        .dashboard-hero {
+            text-align: center;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        .dashboard-hero h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            background: linear-gradient(to right, #ffffff, #d1d5db);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .dashboard-hero p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        /* Scenario Grid */
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .scenario-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .scenario-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .scenario-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--card-border-hover);
+            box-shadow: 0 10px 25px rgba(0, 242, 254, 0.1);
+        }
+
+        .scenario-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-header-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.3rem;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .scenario-card:nth-child(even) .card-icon {
+            color: var(--accent-purple);
+        }
+
+        .card-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .scenario-card:hover .card-badge {
+            color: var(--text-primary);
+        }
+
+        .card-body h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.15rem;
+            margin-bottom: 6px;
+            transition: color 0.2s ease;
+        }
+
+        .scenario-card:hover .card-body h3 {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card-body p {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        /* Custom Input Section */
+        .custom-input-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed var(--card-border);
+            border-radius: 18px;
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .custom-input-card h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .custom-input-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .custom-input-group input {
+            flex-grow: 1;
+            background: rgba(10, 15, 30, 0.8);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 14px 20px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .custom-input-group input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.15);
+        }
+
+        .btn-generate {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 12px;
+            color: #0b0f19;
+            font-weight: 700;
+            font-size: 0.95rem;
+            padding: 0 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .btn-generate:hover {
+            transform: scale(1.03);
+            box-shadow: 0 5px 15px rgba(0, 242, 254, 0.4);
+        }
+
+        /* SCREEN 2: Player View */
+        #player-view {
+            padding: 30px 40px;
+            display: none;
+            flex-direction: column;
+            gap: 30px;
+            flex-grow: 1;
+        }
+
+        /* Player Header */
+        .player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-back {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            border-radius: 10px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--card-border-hover);
+        }
+
+        .player-scenario-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .progress-pill {
+            background: rgba(0, 242, 254, 0.1);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            color: var(--accent-cyan);
+            border-radius: 20px;
+            padding: 5px 14px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        /* Central Dialogue Box with transition animations */
+        .dialogue-container {
+            min-height: 200px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 35px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.03);
+            overflow: hidden;
+        }
+
+        .slide-card {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Slide animations */
+        @keyframes slideOut {
+            from {
+                transform: translateY(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateY(-40px);
+                opacity: 0;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(40px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .slide-card.slide-out {
+            animation: slideOut 0.25s forwards ease-in;
+        }
+
+        .slide-card.slide-in {
+            animation: slideIn 0.35s forwards cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .speaker-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .speaker-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            color: #0b0f19;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .slide-card:nth-child(even) .speaker-avatar {
+            background: var(--secondary-gradient);
+            color: #fff;
+        }
+
+        .speaker-name {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: var(--accent-cyan);
+        }
+
+        .slide-card:nth-child(even) .speaker-name {
+            color: var(--accent-purple);
+        }
+
+        .dialogue-text {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 500;
+            line-height: 1.5;
+            letter-spacing: -0.01em;
+            color: #ffffff;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Analysis Drawer - Grid system */
+        .analysis-drawer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .analysis-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: border-color 0.2s ease;
+        }
+
+        .analysis-box:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .box-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .box-title.translation {
+            color: #00f2fe;
+        }
+
+        .box-title.tip {
+            color: #b155ff;
+        }
+
+        .box-title.vocab {
+            color: #ff9233;
+        }
+
+        .box-content {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+        }
+
+        .box-content.tip-text {
+            font-style: italic;
+        }
+
+        /* Vocabulary Pills */
+        .vocab-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .vocab-pill {
+            background: rgba(255, 146, 51, 0.08);
+            border: 1px solid rgba(255, 146, 51, 0.2);
+            border-radius: 12px;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            cursor: help;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .vocab-pill:hover {
+            background: rgba(255, 146, 51, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .vocab-word {
+            font-weight: 700;
+            color: #ff9233;
+        }
+
+        .vocab-meaning {
+            color: var(--text-secondary);
+            margin-left: 5px;
+        }
+
+        /* Full width block for vocabulary if it exists */
+        .vocab-full-box {
+            grid-column: span 2;
+        }
+
+        /* Flat Progress Bar */
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            width: 0%;
+            transition: width 0.3s cubic-bezier(0.1, 0.8, 0.2, 1);
+        }
+
+        /* Player Controls Footer */
+        .player-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .auto-play-widget {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            padding: 10px 20px;
+            border-radius: 14px;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .toggle-container input {
+            display: none;
+        }
+
+        .toggle-switch {
+            width: 36px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #fff;
+            top: 3px;
+            left: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-container input:checked+.toggle-switch {
+            background: var(--accent-cyan);
+        }
+
+        .toggle-container input:checked+.toggle-switch::after {
+            left: 19px;
+        }
+
+        .speed-slider-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .speed-slider {
+            -webkit-appearance: none;
+            width: 80px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .speed-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .speed-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.3);
+        }
+
+        /* Centered Nav Buttons */
+        .navigation-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .btn-control {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 1px solid var(--card-border);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-primary);
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .btn-control:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--card-border-hover);
+            transform: scale(1.05);
+        }
+
+        .btn-control.play-btn {
+            width: 58px;
+            height: 58px;
+            background: var(--primary-gradient);
+            border: none;
+            color: #0b0f19;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+        }
+
+        .btn-control.play-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 4px 20px rgba(0, 242, 254, 0.5);
+        }
+
+        /* Keyboard Help Widget */
+        .keyboard-hint {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .key-badge {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-family: monospace;
+            color: var(--text-primary);
+        }
+
+        /* SCREEN 3: Loading / Generating Overlay */
+        #loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(15px);
+            z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .spinner {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: conic-gradient(from 180deg at 50% 50%, rgba(0, 242, 254, 0) 0deg, #00f2fe 360deg);
+            animation: spin 1s linear infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinner::after {
+            content: '';
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            background: #0d1221;
+            border-radius: 50%;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .loading-subtext {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            margin-top: -15px;
+        }
+
+        /* Error notification */
+        .error-notification {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+        }
+
+        /* Personal Saved Dictionary Layout & Styling */
+        .dashboard-content-layout {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+        .dashboard-left-col {
+            flex: 1.8;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .dashboard-right-col {
+            flex: 1.1;
+            position: sticky;
+            top: 20px;
+            width: 100%;
+        }
+
+        .saved-dictionary-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: 400px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .saved-dictionary-card h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.15rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #ff9233;
+            margin: 0;
+        }
+
+        .dictionary-desc {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .dictionary-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 480px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .dictionary-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .dictionary-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .empty-dictionary-msg {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-top: 40px;
+            font-style: italic;
+        }
+
+        .dict-word-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            position: relative;
+        }
+
+        .dict-word-item:hover {
+            border-color: rgba(255, 146, 51, 0.3);
+            background: rgba(255, 146, 51, 0.02);
+            transform: translateY(-2px);
+        }
+
+        .dict-word-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .dict-word-title-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .dict-word-icon {
+            font-size: 0.8rem;
+            color: #ff9233;
+        }
+
+        .dict-word-name {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+
+        .dict-word-meaning {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .dict-word-delete-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+            font-size: 0.85rem;
+            transition: color 0.2s, transform 0.2s;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dict-word-delete-btn:hover {
+            color: #ef4444;
+            transform: scale(1.15);
+        }
+
+        .dict-example-box {
+            margin-top: 8px;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .dict-example-sentence {
+            font-size: 0.88rem;
+            color: #fff;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .dict-example-translation {
+            font-size: 0.8rem;
+            color: #00f2fe;
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        .dict-example-loading {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.08);
+        }
+
+        .dict-example-loading i {
+            animation: spin 1s linear infinite;
+        }
+
+        .vocab-star-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+            transition: transform 0.2s;
+            padding: 4px;
+            margin-left: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .vocab-star-btn:hover {
+            transform: scale(1.2);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Mobile Responsiveness Media Queries */
+        @media (max-width: 768px) {
+            #app-container {
+                margin: 0;
+                min-height: 100vh;
+                border-radius: 0;
+                max-width: 100%;
+                border: none;
+            }
+
+            header {
+                padding: 16px 20px;
+            }
+
+            #dashboard-view {
+                padding: 20px;
+                gap: 25px;
+            }
+
+            .dashboard-hero h1 {
+                font-size: 1.7rem;
+            }
+
+            .dashboard-hero p {
+                font-size: 0.95rem;
+            }
+
+            .dashboard-content-layout {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .dashboard-left-col,
+            .dashboard-right-col {
+                width: 100%;
+                flex: none;
+            }
+
+            .saved-dictionary-card {
+                min-height: 250px;
+            }
+
+            .scenario-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .custom-input-card {
+                padding: 20px;
+            }
+
+            .custom-input-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .btn-generate {
+                padding: 14px 20px;
+                justify-content: center;
+                font-size: 0.95rem;
+            }
+
+            #player-view {
+                padding: 20px;
+                gap: 20px;
+            }
+
+            .dialogue-container {
+                padding: 24px;
+                min-height: 160px;
+            }
+
+            .dialogue-text {
+                font-size: 1.25rem;
+                line-height: 1.4;
+            }
+
+            .analysis-drawer {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .vocab-full-box {
+                grid-column: span 1;
+            }
+
+            .player-footer {
+                flex-direction: column;
+                gap: 20px;
+                align-items: center;
+                margin-top: 5px;
+            }
+
+            .auto-play-widget {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .keyboard-hint {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="app-container">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>English Slide Player</span>
+            </div>
+            <div id="header-extra"></div>
+        </header>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay">
+            <div class="spinner"></div>
+            <div class="loading-text" id="loading-text">Generating scenario...</div>
+            <div class="loading-subtext" id="loading-subtext">Talking to Mistral AI</div>
+        </div>
+
+        <!-- ERROR MESSAGE CONTAINER -->
+        <div style="padding: 0 40px; margin-top: 20px;">
+            <div class="error-notification" id="errorBar">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span id="errorMsg">Failed to generate.</span>
+            </div>
+        </div>
+
+        <!-- SCREEN 1: DASHBOARD VIEW -->
+        <div id="dashboard-view">
+            <div class="dashboard-hero">
+                <h1>Enhance your English proficiency!</h1>
+                <p>Select a situation below. You'll learn English through a realistic conversation presented in an
+                    easy-to-follow slide format.</p>
+            </div>
+
+            <div class="dashboard-content-layout">
+                <div class="dashboard-left-col">
+                    <!-- Curated Scenarios Grid -->
+                    <div class="scenario-grid">
+                        <!-- Card 1 -->
+                        <div class="scenario-card" onclick="selectScenario('Office Meeting & Presentation')">
+                            <div class="card-header-info">
+                                <div class="card-icon"><i class="fa-solid fa-briefcase"></i></div>
+                                <div class="card-badge">Corporate</div>
+                            </div>
+                            <div class="card-body">
+                                <h3>Office Presentation</h3>
+                                <p>Learn professional expressions, pitch projects, and handle status updates like a boss.</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 2 -->
+                        <div class="scenario-card" onclick="selectScenario('Salary Hike Negotiation')">
+                            <div class="card-header-info">
+                                <div class="card-icon"><i class="fa-solid fa-money-bill-trend-up"></i></div>
+                                <div class="card-badge">Negotiation</div>
+                            </div>
+                            <div class="card-body">
+                                <h3>Salary Negotiation</h3>
+                                <p>Polite and persuasive phrasing to discuss appraisal, increments, and salary terms.</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 3 -->
+                        <div class="scenario-card" onclick="selectScenario('Job Interview Prep')">
+                            <div class="card-header-info">
+                                <div class="card-icon"><i class="fa-solid fa-user-tie"></i></div>
+                                <div class="card-badge">Formal</div>
+                            </div>
+                            <div class="card-body">
+                                <h3>Job Interview Prep</h3>
+                                <p>Practice answering tough interview questions and introducing yourself confidently.</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 4 -->
+                        <div class="scenario-card" onclick="selectScenario('Shopping & Bargaining in a Mall')">
+                            <div class="card-header-info">
+                                <div class="card-icon"><i class="fa-solid fa-bag-shopping"></i></div>
+                                <div class="card-badge">Practical</div>
+                            </div>
+                            <div class="card-body">
+                                <h3>Shopping & Bargaining</h3>
+                                <p>Ask for discounts, enquire about sizes, and interact smoothly with cashiers.</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 5 -->
+                        <div class="scenario-card" onclick="selectScenario('Dining out in a fancy Restaurant')">
+                            <div class="card-header-info">
+                                <div class="card-icon"><i class="fa-solid fa-utensils"></i></div>
+                                <div class="card-badge">Daily Life</div>
+                            </div>
+                            <div class="card-body">
+                                <h3>Restaurant & Dining</h3>
+                                <p>Order food, ask about menu recommendations, and handle payments effortlessly.</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 6 -->
+                        <div class="scenario-card" onclick="selectScenario('Casual Networking at a Tech Conference')">
+                            <div class="card-header-info">
+                                <div class="card-icon"><i class="fa-solid fa-comments"></i></div>
+                                <div class="card-badge">Social</div>
+                            </div>
+                            <div class="card-body">
+                                <h3>Networking & Small Talk</h3>
+                                <p>Break the ice with professionals, introduce yourself, and share contact details.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Custom Scenario Input -->
+                    <div class="custom-input-card">
+                        <h3><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--accent-cyan);"></i>Give your desired Custom Situation</h3>
+                        <div class="custom-input-group">
+                            <input type="text" id="customInput" placeholder="Write your situation here (e.g., Talking to a visa officer, Asking for help on airport, Asking gym trainer to explain benchpress)...">
+                            <button class="btn-generate" onclick="generateCustom()">
+                                <i class="fa-solid fa-play"></i> Generate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-right-col">
+                    <!-- Saved Dictionary Panel -->
+                    <div class="saved-dictionary-card">
+                        <h3><i class="fa-solid fa-star"></i> Personal Dictionary</h3>
+                        <p class="dictionary-desc">Star vocabulary words during scenarios to save them here. Click a word to view usage examples and translations.</p>
+                        <div class="dictionary-list" id="dictionaryList">
+                            <div class="empty-dictionary-msg">No bookmarked words yet. Star words in a scenario to begin!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: PLAYER VIEW -->
+        <div id="player-view">
+            <!-- Player Top Header -->
+            <div class="player-header">
+                <button class="btn-back" onclick="backToDashboard()">
+                    <i class="fa-solid fa-arrow-left"></i> Back
+                </button>
+                <div class="player-scenario-title" id="scenarioTitle">Office Meeting</div>
+                <div class="progress-pill" id="progressPill">0 / 0</div>
+            </div>
+
+            <!-- Main Slide Card -->
+            <div class="dialogue-container">
+                <div class="slide-card" id="slideCard">
+                    <!-- Speaker & Sentence injected here dynamically -->
+                    <div class="speaker-info">
+                        <div class="speaker-avatar">A</div>
+                        <span class="speaker-name">Speaker 1</span>
+                    </div>
+                    <div class="dialogue-text">Select a scenario to begin...</div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="progressBar"></div>
+            </div>
+
+            <!-- Analysis Drawer -->
+            <div class="analysis-drawer">
+                <!-- Translation Box -->
+                <div class="analysis-box">
+                    <div class="box-title translation">
+                        <i class="fa-solid fa-language"></i> Hinglish Translation
+                    </div>
+                    <div class="box-content" id="translationContent">
+                        Translation will appear here.
+                    </div>
+                </div>
+
+                <!-- Learning Tip Box -->
+                <div class="analysis-box">
+                    <div class="box-title tip">
+                        <i class="fa-solid fa-lightbulb"></i> Learning Tip / Alternatives
+                    </div>
+                    <div class="box-content tip-text" id="tipContent">
+                        Tips will appear here.
+                    </div>
+                </div>
+
+                <!-- Vocabulary Box (Full width) -->
+                <div class="analysis-box vocab-full-box">
+                    <div class="box-title vocab">
+                        <i class="fa-solid fa-book-open"></i> Vocabulary Highlights
+                    </div>
+                    <div class="vocab-list" id="vocabList">
+                        <!-- Vocabulary items dynamically injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls Panel -->
+            <div class="player-footer">
+                <!-- Auto play speed settings -->
+                <div class="auto-play-widget">
+                    <label class="toggle-container">
+                        <input type="checkbox" id="autoplayCheck" onchange="toggleAutoplay()">
+                        <div class="toggle-switch"></div>
+                        <span>Auto-Play</span>
+                    </label>
+                    <div class="speed-slider-group">
+                        <span>Slow</span>
+                        <input type="range" class="speed-slider" id="speedSlider" min="3" max="10" value="6"
+                            onchange="updateAutoplaySpeed()">
+                        <span>Fast</span>
+                    </div>
+                </div>
+
+                <!-- Central Control buttons -->
+                <div class="navigation-controls">
+                    <button class="btn-control" onclick="prevSlide()" title="Previous (Left Arrow)">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <button class="btn-control play-btn" id="playBtn" onclick="togglePlayState()"
+                        title="Play / Pause (Space)">
+                        <i class="fa-solid fa-play" id="playIcon"></i>
+                    </button>
+                    <button class="btn-control" onclick="nextSlide()" title="Next (Right Arrow / Space when paused)">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <!-- Keyboard Help Hint -->
+                <div class="keyboard-hint">
+                    <span class="key-badge">←</span>
+                    <span class="key-badge">→</span>
+                    <span>Navigate</span>
+                    <span class="key-badge" style="margin-left: 10px;">Space</span>
+                    <span>Play/Pause</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentDialogue = [];
+        let currentIndex = 0;
+        let autoplayTimer = null;
+        let isPlaying = false;
+
+        // Custom loading text loops
+        const loadingTexts = [
+            "Analyzing Scenario...",
+            "Creating character dialogue...",
+            "Drafting realistic situations...",
+            "Translating sentences to Hinglish...",
+            "Extracting vocabulary definitions...",
+            "Adding professional learning tips..."
+        ];
+        let loadingTextIndex = 0;
+        let loadingInterval = null;
+
+        function startLoadingIndicator() {
+            document.getElementById('loading-overlay').style.display = 'flex';
+            document.getElementById('errorBar').style.display = 'none';
+            loadingTextIndex = 0;
+            document.getElementById('loading-text').innerText = loadingTexts[0];
+
+            loadingInterval = setInterval(() => {
+                loadingTextIndex = (loadingTextIndex + 1) % loadingTexts.length;
+                document.getElementById('loading-text').innerText = loadingTexts[loadingTextIndex];
+            }, 2500);
+        }
+
+        function stopLoadingIndicator() {
+            clearInterval(loadingInterval);
+            document.getElementById('loading-overlay').style.display = 'none';
+        }
+
+        function showError(message) {
+            const errorBar = document.getElementById('errorBar');
+            const errorMsg = document.getElementById('errorMsg');
+            errorMsg.innerText = message;
+            errorBar.style.display = 'flex';
+            setTimeout(() => {
+                errorBar.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
+
+        // Selection triggers scenario generation
+        async function selectScenario(scenarioName) {
+            startLoadingIndicator();
+            try {
+                const response = await fetch('/generate_scenario', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ scenario: scenarioName })
+                });
+
+                const data = await response.json();
+                stopLoadingIndicator();
+
+                if (data.error) {
+                    showError(data.error);
+                    return;
+                }
+
+                loadDialogue(data);
+
+            } catch (err) {
+                console.error(err);
+                stopLoadingIndicator();
+                showError("Could not connect to server. Check if the backend is running.");
+            }
+        }
+
+        function generateCustom() {
+            const val = document.getElementById('customInput').value.trim();
+            if (!val) {
+                showError("Please type a situation description first!");
+                return;
+            }
+            selectScenario(val);
+        }
+
+        // Populate and start playing
+        function loadDialogue(data) {
+            currentDialogue = data.dialogue || [];
+            document.getElementById('scenarioTitle').innerText = data.scenario || "Selected Situation";
+            currentIndex = 0;
+
+            // Switch views
+            document.getElementById('dashboard-view').style.display = 'none';
+            document.getElementById('player-view').style.display = 'flex';
+
+            // Render first slide
+            renderActiveSlide();
+
+            // Auto start playing
+            startAutoplay();
+        }
+
+        function backToDashboard() {
+            stopAutoplay();
+            document.getElementById('player-view').style.display = 'none';
+            document.getElementById('dashboard-view').style.display = 'flex';
+        }
+
+        // Active slide updates with slide animations
+        function renderActiveSlide() {
+            if (currentDialogue.length === 0) return;
+            const currentItem = currentDialogue[currentIndex];
+
+            const slideCard = document.getElementById('slideCard');
+
+            // Trigger exit slide transition
+            slideCard.classList.remove('slide-in');
+            slideCard.classList.add('slide-out');
+
+            // Update contents after a slight delay to allow slide-out animation to show
+            setTimeout(() => {
+                const avatarChar = currentItem.speaker ? currentItem.speaker.trim()[0].toUpperCase() : 'A';
+                slideCard.innerHTML = `
+                    <div class="speaker-info">
+                        <div class="speaker-avatar">${avatarChar}</div>
+                        <span class="speaker-name">${currentItem.speaker}</span>
+                    </div>
+                    <div class="dialogue-text">${currentItem.text}</div>
+                `;
+
+                // Trigger entry slide-in
+                slideCard.classList.remove('slide-out');
+                slideCard.classList.add('slide-in');
+
+                // Update side drawers / details
+                document.getElementById('translationContent').innerText = currentItem.translation || "No translation provided.";
+
+                const tipContent = document.getElementById('tipContent');
+                if (currentItem.tip) {
+                    tipContent.innerText = currentItem.tip;
+                } else {
+                    tipContent.innerText = "Enjoying this scenario! Read naturally and focus on vocabulary.";
+                }
+
+                // Render vocabulary highlights
+                const vocabList = document.getElementById('vocabList');
+                vocabList.innerHTML = '';
+                if (currentItem.vocabulary && currentItem.vocabulary.length > 0) {
+                    currentItem.vocabulary.forEach(v => {
+                        const pill = document.createElement('div');
+                        pill.className = 'vocab-pill';
+                        
+                        const isSaved = isWordSaved(v.word);
+                        const starClass = isSaved ? 'fa-solid fa-star' : 'fa-regular fa-star';
+                        const starStyle = isSaved ? 'color: #ff9233;' : 'color: var(--text-secondary);';
+                        
+                        pill.innerHTML = `
+                            <span class="vocab-word">${escapeHtml(v.word)}</span> 
+                            <span class="vocab-meaning">${escapeHtml(v.meaning)}</span>
+                            <button class="vocab-star-btn" onclick="toggleSaveWord(event, '${escapeHtml(v.word)}', '${escapeHtml(v.meaning)}')">
+                                <i class="${starClass}" style="${starStyle}" id="star-${escapeHtml(v.word)}"></i>
+                            </button>
+                        `;
+                        vocabList.appendChild(pill);
+                    });
+                } else {
+                    vocabList.innerHTML = '<span style="color: var(--text-secondary); font-size: 0.9rem;">No highlighted words for this sentence.</span>';
+                }
+
+                // Update progress pill & progress bar
+                const total = currentDialogue.length;
+                document.getElementById('progressPill').innerText = `${currentIndex + 1} / ${total}`;
+
+                const pct = ((currentIndex + 1) / total) * 100;
+                document.getElementById('progressBar').style.width = `${pct}%`;
+
+            }, 250);
+        }
+
+        // Navigation Actions
+        function nextSlide() {
+            if (currentDialogue.length === 0) return;
+
+            if (currentIndex < currentDialogue.length - 1) {
+                currentIndex++;
+                renderActiveSlide();
+            } else {
+                // Wrap around or stop playing at the end
+                if (isPlaying) {
+                    togglePlayState(); // Pause at the end
+                }
+                currentIndex = 0; // Wrap back to start
+                renderActiveSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentDialogue.length === 0) return;
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderActiveSlide();
+            }
+        }
+
+        // Auto-play state controls
+        function togglePlayState() {
+            if (isPlaying) {
+                stopAutoplay();
+            } else {
+                startAutoplay();
+            }
+        }
+
+        function toggleAutoplay() {
+            const check = document.getElementById('autoplayCheck');
+            if (check.checked) {
+                startAutoplay();
+            } else {
+                stopAutoplay();
+            }
+        }
+
+        function startAutoplay() {
+            stopAutoplay(); // Clear any existing timers first
+
+            isPlaying = true;
+            document.getElementById('autoplayCheck').checked = true;
+
+            const playIcon = document.getElementById('playIcon');
+            playIcon.className = "fa-solid fa-pause";
+
+            const speed = parseInt(document.getElementById('speedSlider').value) * 1000;
+
+            autoplayTimer = setInterval(() => {
+                nextSlide();
+            }, speed);
+        }
+
+        function stopAutoplay() {
+            isPlaying = false;
+            document.getElementById('autoplayCheck').checked = false;
+
+            const playIcon = document.getElementById('playIcon');
+            playIcon.className = "fa-solid fa-play";
+
+            if (autoplayTimer) {
+                clearInterval(autoplayTimer);
+                autoplayTimer = null;
+            }
+        }
+
+        function updateAutoplaySpeed() {
+            if (isPlaying) {
+                startAutoplay(); // Restart with new interval speed
+            }
+        }
+
+        // Keyboard navigation setup
+        document.addEventListener('keydown', function (event) {
+            const playerView = document.getElementById('player-view');
+            if (playerView.style.display === 'flex') {
+                if (event.key === 'ArrowRight') {
+                    event.preventDefault();
+                    nextSlide();
+                } else if (event.key === 'ArrowLeft') {
+                    event.preventDefault();
+                    prevSlide();
+                } else if (event.key === ' ') {
+                    event.preventDefault();
+                    togglePlayState();
+                }
+            }
+        });
+
+        // --- Personal Saved Dictionary Functions ---
+        function getSavedWords() {
+            try {
+                return JSON.parse(localStorage.getItem('savedWords')) || [];
+            } catch(e) {
+                return [];
+            }
+        }
+
+        function isWordSaved(word) {
+            const list = getSavedWords();
+            return list.some(item => item.word.toLowerCase() === word.toLowerCase());
+        }
+
+        function toggleSaveWord(event, word, meaning) {
+            event.stopPropagation();
+            let list = getSavedWords();
+            const index = list.findIndex(item => item.word.toLowerCase() === word.toLowerCase());
+            const icon = document.getElementById(`star-${word}`);
+            
+            if (index > -1) {
+                // Remove it
+                list.splice(index, 1);
+                if (icon) {
+                    icon.className = 'fa-regular fa-star';
+                    icon.style.color = 'var(--text-secondary)';
+                }
+            } else {
+                // Add it
+                list.push({ word: word, meaning: meaning, exampleSentence: null, exampleTranslation: null });
+                if (icon) {
+                    icon.className = 'fa-solid fa-star';
+                    icon.style.color = '#ff9233';
+                }
+            }
+            
+            localStorage.setItem('savedWords', JSON.stringify(list));
+            renderDictionary();
+        }
+
+        function deleteWord(event, word) {
+            if (event) event.stopPropagation();
+            let list = getSavedWords();
+            list = list.filter(item => item.word.toLowerCase() !== word.toLowerCase());
+            localStorage.setItem('savedWords', JSON.stringify(list));
+            renderDictionary();
+            
+            // If the active slide has this word, update its star icon
+            const icon = document.getElementById(`star-${word}`);
+            if (icon) {
+                icon.className = 'fa-regular fa-star';
+                icon.style.color = 'var(--text-secondary)';
+            }
+        }
+
+        function renderDictionary() {
+            const listContainer = document.getElementById('dictionaryList');
+            const list = getSavedWords();
+            
+            if (list.length === 0) {
+                listContainer.innerHTML = '<div class="empty-dictionary-msg">No bookmarked words yet. Star words in a scenario to begin!</div>';
+                return;
+            }
+            
+            listContainer.innerHTML = '';
+            list.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'dict-word-item';
+                itemDiv.id = `dict-item-${item.word}`;
+                itemDiv.onclick = () => showWordExample(item.word);
+                
+                itemDiv.innerHTML = `
+                    <div class="dict-word-header">
+                        <div class="dict-word-title-group">
+                            <i class="fa-solid fa-star dict-word-icon"></i>
+                            <span class="dict-word-name">${escapeHtml(item.word)}</span>
+                            <span class="dict-word-meaning">— ${escapeHtml(item.meaning)}</span>
+                        </div>
+                        <button class="dict-word-delete-btn" onclick="deleteWord(event, '${escapeHtml(item.word)}')">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                    <div id="dict-example-container-${item.word}"></div>
+                `;
+                listContainer.appendChild(itemDiv);
+            });
+        }
+
+        async function showWordExample(word) {
+            const container = document.getElementById(`dict-example-container-${word}`);
+            if (!container) return;
+            
+            // Check if already open
+            if (container.innerHTML !== '') {
+                container.innerHTML = ''; // Toggle collapse
+                return;
+            }
+            
+            // Get from storage
+            let list = getSavedWords();
+            const itemIndex = list.findIndex(item => item.word.toLowerCase() === word.toLowerCase());
+            if (itemIndex === -1) return;
+            const item = list[itemIndex];
+            
+            // If example is already generated and cached, render immediately
+            if (item.exampleSentence && item.exampleTranslation) {
+                renderExampleBox(container, item.exampleSentence, item.exampleTranslation);
+                return;
+            }
+            
+            // Show loading state
+            container.innerHTML = `
+                <div class="dict-example-loading">
+                    <i class="fa-solid fa-circle-notch animate-spin"></i>
+                    <span>Generating example...</span>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch('/generate_example', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ word: item.word, meaning: item.meaning })
+                });
+                const data = await response.json();
+                
+                if (data.error) {
+                    container.innerHTML = `<div style="color: #ef4444; font-size: 0.8rem; margin-top: 8px;">${data.error}</div>`;
+                    return;
+                }
+                
+                // Cache it
+                list[itemIndex].exampleSentence = data.sentence;
+                list[itemIndex].exampleTranslation = data.translation;
+                localStorage.setItem('savedWords', JSON.stringify(list));
+                
+                // Render example box
+                renderExampleBox(container, data.sentence, data.translation);
+                
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = `<div style="color: #ef4444; font-size: 0.8rem; margin-top: 8px;">Failed to fetch example sentence.</div>`;
+            }
+        }
+
+        function renderExampleBox(container, sentence, translation) {
+            container.innerHTML = `
+                <div class="dict-example-box">
+                    <div class="dict-example-sentence">${escapeHtml(sentence)}</div>
+                    <div class="dict-example-translation">${escapeHtml(translation)}</div>
+                </div>
+            `;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Initialize personal dictionary on load
+        renderDictionary();
+    </script>
+</body>
+
+</html>

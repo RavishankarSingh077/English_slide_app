@@ -1,0 +1,13 @@
+{
+  "mood": "happy",
+  "word_of_day": {
+    "word": "Resilient",
+    "date": "2026-07-20",
+    "completed": false
+  },
+  "current_scenario": null,
+  "user_facts": {
+    "job": "AI Engineer",
+    "father_job": "Army Officer"
+  }
+}
