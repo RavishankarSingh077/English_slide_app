@@ -56,7 +56,7 @@ def get_mistral_api_key():
 def run_model_inference(system_content, user_content):
     api_key = get_mistral_api_key()
     if not api_key:
-        raise ValueError("MISTRAL_API_KEY Secret is missing! Please set MISTRAL_API_KEY in Space Settings -> Secrets.")
+        raise ValueError("MISTRAL_API_KEY Secret is missing! Please set MISTRAL_API_KEY in environment variables.")
 
     base_url = os.getenv("MISTRAL_API_URL", "https://api.mistral.ai/v1").strip().rstrip("/")
     endpoint = f"{base_url}/chat/completions"
@@ -114,9 +114,18 @@ app = FastAPI(title="Master English - AI Tutor")
 @app.get("/index.html", response_class=HTMLResponse)
 @app.get("/static/index.html", response_class=HTMLResponse)
 async def serve_index():
-    template_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", "index.html")
-    with open(template_path, "r", encoding="utf-8") as f:
-        return HTMLResponse(content=f.read(), status_code=200)
+    possible_paths = [
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", "index.html"),
+        os.path.join(os.getcwd(), "templates", "index.html"),
+        "templates/index.html",
+        "index.html"
+    ]
+    for p in possible_paths:
+        if os.path.exists(p):
+            with open(p, "r", encoding="utf-8") as f:
+                return HTMLResponse(content=f.read(), status_code=200)
+    
+    return HTMLResponse(content="<h1>Error: templates/index.html file not found!</h1>", status_code=500)
 
 @app.post("/generate_scenario")
 async def generate_scenario(request: Request):
