@@ -114,18 +114,21 @@ app = FastAPI(title="Master English - AI Tutor")
 @app.get("/index.html", response_class=HTMLResponse)
 @app.get("/static/index.html", response_class=HTMLResponse)
 async def serve_index():
-    possible_paths = [
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", "index.html"),
-        os.path.join(os.getcwd(), "templates", "index.html"),
-        "templates/index.html",
-        "index.html"
-    ]
-    for p in possible_paths:
-        if os.path.exists(p):
-            with open(p, "r", encoding="utf-8") as f:
-                return HTMLResponse(content=f.read(), status_code=200)
-    
-    return HTMLResponse(content="<h1>Error: templates/index.html file not found!</h1>", status_code=500)
+    try:
+        possible_paths = [
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", "index.html"),
+            os.path.join(os.getcwd(), "templates", "index.html"),
+            "templates/index.html",
+            "index.html"
+        ]
+        for p in possible_paths:
+            if os.path.exists(p):
+                with open(p, "r", encoding="utf-8") as f:
+                    return HTMLResponse(content=f.read(), status_code=200)
+        
+        return HTMLResponse(content="<h1>Error: templates/index.html file not found!</h1>", status_code=200)
+    except Exception as e:
+        return HTMLResponse(content=f"<h1>Server Error: {str(e)}</h1>", status_code=200)
 
 @app.post("/generate_scenario")
 async def generate_scenario(request: Request):
@@ -177,5 +180,10 @@ async def generate_example(request: Request):
 
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.getenv("PORT", 7860))
+    port_str = os.getenv("PORT", "7860")
+    try:
+        port = int(port_str)
+    except ValueError:
+        port = 7860
+    print(f"Starting server on 0.0.0.0:{port}...")
     uvicorn.run(app, host="0.0.0.0", port=port)
